@@ -1,0 +1,79 @@
+package com.takeda.tgd.dao;
+
+import com.takeda.tgd.entities.GeneSequences;
+import com.takeda.tgd.entities.SwissprotIsoforms;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.transform.Transformers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public class GeneDetailSearchDAO {
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    public Session getCurrentSession(){
+        return sessionFactory.getCurrentSession();
+    }
+
+    private final String seqQuery = "SELECT \n" +
+            "   G.UNIQUE_GENE AS \"uniqueGene\",\n" +
+            "   G.GENE_REFSEQ_ID AS \"geneRefseqId\",\n" +
+            "	O.UNIQUE_SERIALNO AS \"uniqueSerialNo\",\n" +
+            "	O.GENE_ID AS \"geneId\",\n" +
+            "	M.UNIQUE_NCBI_MRNA AS \"uniqueNcbiMrna\",\n" +
+            "	M.GENE_ID AS \"mrnaGeneId\",\n" +
+            "	M.REFSEQ_ID AS \"mrnaRefseqId\",\n" +
+            "	M.PRIMARYID AS \"mrnaPrimaryId\",\n" +
+            "	M.VERSION AS \"mrnaVersion\",\n" +
+            "	M.DESCRIPTION AS \"mrnaDescription\",\n" +
+            "	M.LENGTH AS \"mrnaLength\",\n" +
+            "	P.UNIQUE_NCBI_PROTEIN AS \"uniqueNcbiProtein\",\n" +
+            "	P.GENE_ID AS \"proteinGeneId\",\n" +
+            "	P.REFSEQ_ID AS \"proteinRefseqId\",\n" +
+            "	P.PRIMARYID AS \"proteinPrimaryId\",\n" +
+            "	P.VERSION AS \"proteinVersion\",\n" +
+            "	P.DESCRIPTION AS \"proteinDescription\",\n" +
+            "	P.LENGTH AS \"proteinLength\"\n" +
+   
+            "FROM\n" +
+            "	MRNA_ON_PROTEIN O\n" +
+            "	JOIN NCBI_MRNA M\n" +
+            "	  ON O.MRNA_REFSEQ_ID = M.REFSEQ_ID\n" +
+            "	JOIN NCBI_PROTEIN P\n" +
+            "	  ON O.PROTEIN_REFSEQ_ID = P.REFSEQ_ID \n" +
+            "       JOIN NCBI_GENE G\n" +
+            "         ON O.GENE_ID = G.GENE_ID\n"; 
+            
+
+    public List<GeneSequences> getGeneSequencesByGeneId(Integer geneId){
+        return getCurrentSession()
+                .createSQLQuery(seqQuery + "WHERE O.GENE_ID = " + geneId.toString())
+                .setResultTransformer(Transformers.aliasToBean(GeneSequences.class))
+                .list();
+    }
+
+    
+    private final String isoQuery = "SELECT \n" +
+            
+            "	SP.ISOFORM AS \"isoform\",\n" +
+            "	SP.LENGTH AS \"isoformLength\"\n" +
+            "FROM\n" +
+            "      NCBI_ON_SWISSPROT NOS\n" +
+            "       JOIN SWISSPROT_PROTEIN SP\n" +
+            "         ON NOS.SWISSPROT_ID = SP.SWISSPROT_ID\n";
+
+    public List<SwissprotIsoforms> getSwissprotIsoformsByGeneId(Integer geneId){
+        return getCurrentSession()
+                .createSQLQuery(isoQuery + "WHERE NOS.GENE_ID = " + geneId.toString())
+                .setResultTransformer(Transformers.aliasToBean(SwissprotIsoforms.class))
+                .list();
+    }
+    
+    
+  
+}
