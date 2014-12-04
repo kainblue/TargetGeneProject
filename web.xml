@@ -1,0 +1,129 @@
+<web-app version="2.4"
+	xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+	<display-name>Target Gene Database</display-name>
+
+    <!--Jespa Config-->
+
+    <filter>
+      <filter-name>HttpSecurityFilter</filter-name>
+      <filter-class>jespa.http.HttpSecurityFilter</filter-class>
+
+      <init-param>
+          <param-name>http.parameter.username.name</param-name>
+          <param-value>username</param-value>
+      </init-param>
+      <init-param>
+          <param-name>http.parameter.password.name</param-name>
+          <param-value>password</param-value>
+      </init-param>
+      <init-param>
+          <param-name>http.parameter.logout.name</param-name>
+          <param-value>logout</param-value>
+      </init-param>
+      <init-param>
+          <param-name>http.parameter.anonymous.name</param-name>
+          <param-value>anon</param-value>
+      </init-param>
+      <init-param>
+          <param-name>fallback.location</param-name>
+          <param-value>/jespa/Login.jsp</param-value>
+      </init-param>
+      <init-param>
+          <param-name>excludes</param-name>
+          <param-value>/Login.jsp</param-value>
+      </init-param>
+      <init-param>
+          <param-name>jespa.log.path</param-name>
+          <param-value>\\netapp2\ngo-reporting$\Resource\jespa.log</param-value>
+      </init-param>
+      <init-param>
+          <param-name>jespa.log.level</param-name>
+          <param-value>2</param-value>
+      </init-param>
+      <init-param>
+          <param-name>jespa.bindstr</param-name>
+          <param-value>CORP-DC01-PRD.CORP.MPI.COM</param-value>
+      </init-param>
+      <init-param>
+          <param-name>jespa.service.acctname</param-name>
+          <param-value>TGDJespaUser$@corp.mpi.com</param-value>
+      </init-param>
+      <init-param>
+          <param-name>jespa.service.password</param-name>
+          <param-value>Vespa987!</param-value>
+      </init-param>
+      <init-param>
+          <param-name>jespa.account.canonicalForm</param-name>
+          <param-value>3</param-value>
+      </init-param>
+    </filter>
+
+    <filter-mapping>
+      <filter-name>HttpSecurityFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- The definition of the Root Spring Container shared by all Servlets and Filters -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/root-context.xml</param-value>
+    </context-param>
+
+    <!-- Creates the Spring Container shared by all Servlets and Filters -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <servlet>
+		<servlet-name>mvc-dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/mvc-dispatcher-servlet.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>mvc-dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+    <!--
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+
+    <welcome-file-list>
+        <welcome-file>/</welcome-file>
+    </welcome-file-list>
+    -->
+
+    <jsp-config>
+        <jsp-property-group>
+            <description>header and footer settings</description>
+            <url-pattern>/WEB-INF/views/jsp/*</url-pattern>
+            <include-prelude>/WEB-INF/views/jspf/header.jspf</include-prelude>
+            <include-coda>/WEB-INF/views/jspf/footer.jspf</include-coda>
+        </jsp-property-group>
+    </jsp-config>
+
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error/404</location>
+    </error-page>
+    <!--
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error/500</location>
+    </error-page>
+    -->
+
+</web-app>
